@@ -1,0 +1,60 @@
+﻿@using LandT_Defence.Models
+@{
+    LnTDefenceEntities db = new LnTDefenceEntities();
+    var activeworkers = db.TagWorkers.Where(tg => tg.IsActive == true).ToList();
+
+}
+
+    <div class="row">
+        <div class="col s12">
+            <div id="validations" class="card card-tabs">
+                <div class="card-content">
+                    <div class="card-title">
+                       
+                            <div class="col s12 m6 l10">
+                                <h4 class="card-title">Tags</h4>
+                            </div>
+                      
+                    </div>
+                    <div id="view-validations" class="active">
+                        <table class="table datatable-complex-header" id="tblrow">
+                            <thead>
+                                <tr>
+                                    <th>Tag Name</th>
+                                    <th>WorkerName</th>
+                                    <th>Assign Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              @if (activeworkers!=null)
+                              {
+                                  foreach (var item in activeworkers)
+                                  {
+                                      var e = item.TagID.Trim();
+                                      var w = item.WorkerID.Trim();
+                                      var tag = db.Tags.FirstOrDefault(tg => tg.EUI==e);
+                                      var worker = db.Workers.FirstOrDefault(wk => wk.WorkerCode==w );
+
+                                      <tr>
+                                          <td>
+                                              @tag.EUI
+                                          </td>
+                                          <td>
+                                              @worker.WorkerName
+                                          </td>
+                                          <td>
+                                              @item.AssignedTime
+                                          </td>
+                                      </tr>
+                                  }
+                              }
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
