@@ -1,4 +1,4 @@
-﻿@using LandT_Defence.Models
+@using LandT_Defence.Models
 @{
     LnTDefenceEntities db = new LnTDefenceEntities();
     var activeworkers = db.TagWorkers.Where(tg => tg.IsActive == true).ToList();
@@ -12,7 +12,7 @@
                     <div class="card-title">
                        
                             <div class="col s12 m6 l10">
-                                <h4 class="card-title">Tags</h4>
+                                <h4 class="card-title">Active Workers</h4>
                             </div>
                       
                     </div>
@@ -20,32 +20,40 @@
                         <table class="table datatable-complex-header" id="tblrow">
                             <thead>
                                 <tr>
+                                <th>Sr No </th>
                                     <th>Tag Name</th>
-                                    <th>WorkerName</th>
-                                    <th>Assign Name</th>
+                                    <th>Worker Name</th>
+                                     <th>Worker Code</th>
+                                    <th>Vendor Name</th>
                                 </tr>
                             </thead>
                             <tbody>
                               @if (activeworkers!=null)
                               {
+                                  int i=1;
                                   foreach (var item in activeworkers)
                                   {
-                                      var e = item.TagID.Trim();
+                                     var e = item.TagID.Trim();
                                       var w = item.WorkerID.Trim();
-                                      var tag = db.Tags.FirstOrDefault(tg => tg.EUI==e);
-                                      var worker = db.Workers.FirstOrDefault(wk => wk.WorkerCode==w );
-
+                                      <!-- var tag = db.Tags.FirstOrDefault(tg => tg.EUI==e);-->
+                                      var worker = db.Workers.FirstOrDefault(wk => wk.WorkerCode==w ); 
+                                         var vendor = db.Vendors.FirstOrDefault(vn=>vn.VendorID==worker.VendorID);
                                       <tr>
+                                      <td>@i</td>
                                           <td>
-                                              @tag.EUI
+                                              @e
                                           </td>
                                           <td>
                                               @worker.WorkerName
                                           </td>
                                           <td>
-                                              @item.AssignedTime
+                                              @w
+                                          </td>
+                                          <td>
+                                              @vendor.VendorName
                                           </td>
                                       </tr>
+                                      i++;
                                   }
                               }
                             </tbody>
