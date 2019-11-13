@@ -1,7 +1,5 @@
 @using LandT_Defence.Models
 @{
-    LnTDefenceEntities db = new LnTDefenceEntities();
-    var activeworkers = db.TagWorkers.Where(tg => tg.IsActive == true).ToList();
 
 }
 
@@ -12,50 +10,22 @@
                     <div class="card-title">
                        
                             <div class="col s12 m6 l10">
-                                <h4 class="card-title">Active Workers</h4>
+                                <h4 class="card-title">Active Worker</h4>
                             </div>
                       
                     </div>
                     <div id="view-validations" class="active">
-                        <table class="table datatable-complex-header" id="tblrow">
+                        <table class="table datatable-complex-header" id="activeworker">
                             <thead>
                                 <tr>
-                                <th>Sr No </th>
+                                    <th>SrNo</th>
                                     <th>Tag Name</th>
-                                    <th>Worker Name</th>
-                                     <th>Worker Code</th>
-                                    <th>Vendor Name</th>
+                                    <th>WorkerName</th>
+                                    <th>Assign Name</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                              @if (activeworkers!=null)
-                              {
-                                  int i=1;
-                                  foreach (var item in activeworkers)
-                                  {
-                                     var e = item.TagID.Trim();
-                                      var w = item.WorkerID.Trim();
-                                      <!-- var tag = db.Tags.FirstOrDefault(tg => tg.EUI==e);-->
-                                      var worker = db.Workers.FirstOrDefault(wk => wk.WorkerCode==w ); 
-                                         var vendor = db.Vendors.FirstOrDefault(vn=>vn.VendorID==worker.VendorID);
-                                      <tr>
-                                      <td>@i</td>
-                                          <td>
-                                              @e
-                                          </td>
-                                          <td>
-                                              @worker.WorkerName
-                                          </td>
-                                          <td>
-                                              @w
-                                          </td>
-                                          <td>
-                                              @vendor.VendorName
-                                          </td>
-                                      </tr>
-                                      i++;
-                                  }
-                              }
+                            <tbody id="altbody">
+                             
                             </tbody>
                         </table>
 
@@ -66,3 +36,38 @@
             </div>
         </div>
     </div>
+<script>
+    loadAll(Loadcnt, "../common/activeworkerlist");
+
+
+    function Loadcnt(response) {
+
+    listcnt = response;
+    LoadCntDroplist();
+}
+
+
+function LoadCntDroplist() {
+    var dropdown = $('#activeworker tbody#altbody');
+    dropdown.empty();
+    var i = 1;
+    $.each(listcnt, function (index, item) {
+      
+            var html = "<tr>";
+            html += "<td>"+i+"</td>";
+            html += " <td>" + item.tagname + "</td>";
+            html += " <td>" + item.Workername + "</td>";
+            html += "<td>" + item.Vendor + "</td> ";
+            html += "</tr>";
+
+            $("#activeworker tbody#altbody").append(html);
+        i++;
+
+    });
+
+
+
+}
+
+
+</script>
