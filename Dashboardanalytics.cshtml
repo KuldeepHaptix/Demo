@@ -1,0 +1,182 @@
+﻿
+@{
+
+}
+
+
+
+<div class="col s12">
+    <div class="container">
+        <div class="section" id="materialize-sparkline">
+
+            <!--Simple Line Chart-->
+            <div class="row">
+                <div class="col s12 m6 l3">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4 class="card-title">Total Worker</h4>
+                                </div>
+                                <div class="col s12 display-flex">
+                                    <p class="mt-4 pink-text accent-2">
+                                        <i class="material-icons dp48 vertical-align-bottom">arrow_upward</i>
+                                        <label id="total" class="pink-text dp48"></label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4 class="card-title">Active Worker</h4>
+                                </div>
+                                <div class="col s12 display-flex">
+                                    <p class="mt-4 green-text">
+                                        <i class="material-icons dp48 vertical-align-bottom">arrow_upward</i>
+                                        <label id="active" class="green-text"></label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4 class="card-title">Inactive Worker</h4>
+                                </div>
+                                <div class="col s12 display-flex yellow-text">
+                                    <p class="mt-4 ">
+                                        <i class="material-icons dp48 vertical-align-bottom">arrow_upward</i>
+                                        <label id="Inactive" class="yellow-text"></label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4 class="card-title">Todays Total Alerts</h4>
+                                </div>
+                                <div class="col s12 display-flex red-text accent-2">
+                                    <p class="mt-4 ">
+                                        <i class="material-icons dp48 vertical-align-bottom">arrow_downward</i>
+                                        <label id="tag" class="red-text"></label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col s12 m6">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <h4 class="card-title">Active Worker Types</h4>
+                            <div id="myDiv1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m6">
+                    <div class="ct-chart card z-depth-2 border-radius-6">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4 class="card-title">Worker Status</h4>
+                                </div>
+                                <div class="col s12">
+                                    <div id="myDiv">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/app-assets/js/jquery.js"></script>
+    <script>
+
+        var xdata = [];
+        var ydata = [];
+
+        var request = $.ajax({
+        url: "../common/Activeworker",
+        cache: false,
+        type: 'GET',
+        success: function (result) {
+            console.log(result.active);
+            var inactive = result.totaltag - result.active;
+              var data = [{
+            values: [result.active, inactive],
+            labels: ['Active', 'Inactive'],
+            type: 'pie'
+        }];
+
+            Plotly.newPlot('myDiv', data, {}, { displayModeBar: false });
+
+            $("#total").html(result.totaltag);
+            $("#active").html(result.active);
+            $("#Inactive").html(inactive);
+            $("#tag").html(result.Todaysalertscount);
+
+        },
+        error: function (exception) {
+
+        }
+    });
+
+
+
+          var request = $.ajax({
+        url: "../common/WorkerCountBytypes",
+        cache: false,
+        type: 'GET',
+        success: function (result) {
+            console.log(result);
+            for (i = 0; i < result.length; i++) {
+                xdata.push(result[i].WorkerTypeName);
+                ydata.push(result[i].WorkerCount);
+            }
+
+            var trace1 = {
+                x: xdata,
+                y: ydata,
+            name: 'Skilled',
+            type: 'bar'
+        };
+
+        
+
+             var data1 = [trace1];
+             var layout = { barmode: 'group' };
+
+            Plotly.newPlot('myDiv1', data1, layout, {  displayModeBar: false });
+
+
+        },
+        error: function (exception) {
+
+        }
+    });
+
+      
+
+
+
+      
+    </script>
