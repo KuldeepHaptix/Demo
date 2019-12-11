@@ -1,0 +1,53 @@
+ALTER TRIGGER [dbo].[nomotionalert] on [dbo].[PayloadData]
+FOR INSERT 
+AS DECLARE 
+	   @deveui VARCHAR(50),
+	   @alertcode VARCHAR(50),
+	   @alerttype VARCHAR(50),
+	   @alertpriority varchar(50) , 
+	   @timeofalert datetime
+
+ DECLARE @firstcount numeric(10,2)
+DECLARE @secondcount numeric(10,2)
+DECLARE @thirdcount numeric(10,2)
+
+DECLARE @firstcountpitch numeric(10,2)
+DECLARE @secondcountpitch numeric(10,2)
+DECLARE @thirdcountpitch numeric(10,2)
+
+declare @rollc int,@pitch int
+SELECT @deveui = ins.DeviceEUI FROM INSERTED ins;
+
+select  top 2 * into roldata from PayloadData where DeviceEUI=@deveui order by TimeOflog desc
+
+set @alertcode='0n';
+set @alerttype='05';
+set  @alertpriority='05';
+
+select  @firstcount = cast(ins.Roll as numeric(10,2)) FROM INSERTED ins;
+select top 1  @secondcount = cast(ins.Roll as numeric(10,2)) from roldata ins order by TimeOflog desc;
+select top 1  @thirdcount = cast(ins.Roll as numeric(10,2)) from roldata ins order by TimeOflog asc;
+
+select  @firstcountpitch = cast(ins.Pitch as numeric(10,2)) FROM INSERTED ins;
+select top 1  @secondcountpitch = cast(ins.Pitch as numeric(10,2)) from roldata ins order by TimeOflog desc;
+select top 1  @thirdcountpitch = cast(ins.Pitch as numeric(10,2)) from roldata ins order by TimeOflog asc;
+
+
+drop table roldata;
+IF @firstcount <> @secondcount SELECT 0
+ELSE IF @secondcount <> @thirdcount SELECT 0
+ELSE 
+set @rollc=1
+
+IF @firstcountpitch <> @secondcountpitch SELECT 0
+ELSE IF @secondcountpitch <> @thirdcountpitch SELECT 0
+ELSE 
+set @pitch=1
+
+if @rollc+@pitch=2
+INSERT INTO [PayloadAlert]([DeviceEUI],[AlertCode],[AlertType],[AlertPriority],[AlertCounter],[AcXL],[AcXH],[AcYL],[AcYH],[AcZL],[AcZH],[Acc1],[Acc2],[Acc3],IsAcknowledged,Latitude,Longitude,TimeOflog)
+                   VALUES (@deveui, @alertcode, @alerttype,    @alertpriority, '0','',     '','','''','','','','','','','','',
+	CAST(switchoffset(CAST(GETUTCDATE() as datetimeoffset),'+05:30') AS datetime)
+	);
+
+PRINT 'We Successfully Fired the no motion alert in SQL Server.'
